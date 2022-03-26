@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Flask, request, render_template, jsonify
 from service_tools.service import Predictor, Preprocessor
 
@@ -10,8 +11,22 @@ predictor = Predictor()
 
 # Define API endpoints here:
 
+@app.route('/')
+def home():
+    return render_template('index.html')
 
+@app.route('/predict', methods=['POST'])
+def predict():
+    payload = request.get_json()[0]
+    text = payload['text']
+    mlmodel = payload['mlmodel']
+    doc_vec = preprocessor.get_doc_vec(text)
+    sentiment = predictor.predict_sentiment(mlmodel, doc_vec)
 
+    return jsonify(sentiment)
+
+if __name__ == '__main__':
+    app.run(host = "140.112.147.112", port = 3000, debug=True)    
 
 #==============================
 
